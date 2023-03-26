@@ -1,5 +1,6 @@
 package tictactoe;
 
+// ideally, this would be named "PlayerMark", but hyperskill doesn't want me to rename it
 public enum Player {
 
     X("X", "X"),
