@@ -108,11 +108,11 @@ public class Board {
         return count;
     }
 
-    public Player getPlayer(int[] coord) {
+    public Player getPlayerAtCell(int[] coord) {
         return cells[coord[0] - 1][coord[1] - 1].getPlayer();
     }
 
-    public void setPlayer(int[] coord, Player player) {
+    public void setPlayerAtCell(int[] coord, Player player) {
         cells[coord[0] - 1][coord[1] - 1].setPlayer(player);
     }
 
@@ -130,52 +130,5 @@ public class Board {
         }
 
         return cellProjection;
-    }
-
-    public void humanPlayerTurn(Player player) {
-        askCoord: while (true) {
-            System.out.print("Enter the coordinates: ");
-            String[] inputCoord = scanner.nextLine().split(" ");
-            int[] coord = {0, 0};
-
-            for (int i = 0; i < 2; i++) {
-                try {
-                    coord[i] = Integer.parseInt(inputCoord[i]);
-                } catch (NumberFormatException numberFormatException) {
-                    System.out.println("You should enter numbers!");
-                    continue askCoord;
-                }
-
-                if (coord[i] < 1 || coord[i] > 3) {
-                    System.out.println("Coordinates should be from 1 to 3!");
-                    continue askCoord;
-                }
-            }
-
-            if (!this.getPlayer(coord).equals(Player.EMPTY)) {
-                System.out.println("This cell is occupied! Choose another one!");
-                continue;
-            }
-
-            this.setPlayer(coord, player);
-            break;
-        }
-    }
-
-    public void aiTurn(Player player) {
-        List<Map<String, Object>> openCells = new ArrayList<>();
-
-        for (Map<String, Object> element : this.getCellProjection()) {
-            if (element.get("player").equals(Player.EMPTY)) {
-                openCells.add(element);
-            }
-        }
-
-        int index = (int) (Math.floor(Math.random() * openCells.size()));
-        List<Integer> coord = ((List<Integer>) openCells.get(index).get("coord"));
-
-        this.setPlayer(coord.stream().mapToInt(i -> i + 1).toArray(), player);
-
-        System.out.println("Making move level \"easy\"");
     }
 }
