@@ -8,8 +8,6 @@ import static java.lang.Integer.valueOf;
 public class Main {
     public static void main(String[] args) throws Exception {
         // set the board
-        /*System.out.print("Enter the cells: ");
-        String boardInput = scanner.nextLine();*/
         Board board = new Board("_________");
         BoardState boardState;
         int countX = board.countPlayer(Player.X);

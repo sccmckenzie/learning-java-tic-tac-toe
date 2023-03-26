@@ -1,17 +1,26 @@
 package tictactoe;
 
-import java.sql.Array;
 import java.util.*;
 
-public class Board extends BoardUtils {
-    private static Scanner scanner = new Scanner(System.in);
+public class Board {
+    private static final Scanner scanner = new Scanner(System.in);
 
     private final Cell[][] cells;
 
-    public Board(String initState) throws Exception {
+    public Board(String initCells) throws Exception {
         this.cells = new Cell[3][3];
 
-        Deque cellStates = parseStringArray(initState.split(""));
+        Deque<Player> cellStates = new ArrayDeque<>();;
+
+        for (String str : initCells.split("")) {
+            Player player = Player.findBySymbol(str);
+
+            if (player == null) {
+                throw new Exception("Unable to parse input string into CellState.");
+            }
+
+            cellStates.add(player);
+        }
 
         for (int i = 0; i < 3; i++) {
             for (int j = 3; j > 0; j--) {
