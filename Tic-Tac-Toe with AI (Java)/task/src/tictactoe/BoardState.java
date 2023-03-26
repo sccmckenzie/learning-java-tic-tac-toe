@@ -1,5 +1,6 @@
 package tictactoe;
 
+// ideally, this would be named "GameState", but hyperskill doesn't want me to rename it
 public enum BoardState {
 
     UNFINISHED(null),
@@ -7,7 +8,7 @@ public enum BoardState {
     X("X wins"),
     O("O wins");
 
-    String boardStateMsg;
+    final String boardStateMsg;
 
     BoardState(String boardStateMsg) {
         this.boardStateMsg = boardStateMsg;
