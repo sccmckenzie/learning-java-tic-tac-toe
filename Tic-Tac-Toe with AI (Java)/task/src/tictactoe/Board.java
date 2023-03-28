@@ -2,7 +2,7 @@ package tictactoe;
 
 import java.util.*;
 
-public class Board {
+public class Board implements Cloneable {
     private static final Scanner scanner = new Scanner(System.in);
 
     private final Cell[][] cells;
@@ -130,5 +130,19 @@ public class Board {
         }
 
         return cellProjection;
+    }
+
+    @Override
+    public Board clone() throws CloneNotSupportedException {
+        StringBuilder initCells = new StringBuilder();
+        for (Map<String, Object> element : this.getCellProjection()) {
+            initCells.append(((Player) element.get("player")).inputSymbol);
+        }
+
+        try {
+            return new Board (initCells.toString());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
