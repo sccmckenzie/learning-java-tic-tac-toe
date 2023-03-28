@@ -58,12 +58,14 @@ public class Game {
             if (nextPlayer.equals(Player.X)) {
                 switch (playerXType) {
                     case USER -> this.userTurn(Player.X);
-                    default -> this.easyTurn(Player.X);
+                    case EASY -> this.easyTurn(Player.X);
+                    case MEDIUM -> this.mediumTurn(Player.X);
                 }
             } else {
                 switch (playerOType) {
                     case USER -> this.userTurn(Player.O);
-                    default -> this.easyTurn(Player.O);
+                    case EASY -> this.easyTurn(Player.O);
+                    case MEDIUM -> this.mediumTurn(Player.O);
                 }
             }
             countX = board.countPlayer(Player.X);
@@ -115,10 +117,10 @@ public class Game {
         }
     }
 
-    public void easyTurn(Player player) {
+    public void randomMove(Player player, Board board) {
         List<Map<String, Object>> openCells = new ArrayList<>();
 
-        for (Map<String, Object> element : this.board.getCellProjection()) {
+        for (Map<String, Object> element : board.getCellProjection()) {
             if (element.get("player").equals(Player.EMPTY)) {
                 openCells.add(element);
             }
@@ -127,9 +129,58 @@ public class Game {
         int index = (int) (Math.floor(Math.random() * openCells.size()));
         List<Integer> coord = ((List<Integer>) openCells.get(index).get("coord"));
 
-        this.board.setPlayerAtCell(coord.stream().mapToInt(i -> i + 1).toArray(), player);
+        board.setPlayerAtCell(coord.stream().mapToInt(i -> i + 1).toArray(), player);
+    }
 
+    public void easyTurn(Player player) {
+        this.randomMove(player, this.board);
         System.out.println("Making move level \"easy\"");
+    }
+
+    public void mediumTurn(Player player) throws CloneNotSupportedException {
+        Player opponent;
+
+        if (player.equals(Player.X)) {
+            opponent = Player.O;
+        } else {
+            opponent = Player.X;
+        }
+
+        List<Map<String, Object>> openCells = new ArrayList<>();
+
+        for (Map<String, Object> element : board.getCellProjection()) {
+            if (element.get("player").equals(Player.EMPTY)) {
+                openCells.add(element);
+            }
+        }
+
+        // check if player can win with one further move
+        for (Map<String, Object> element : openCells) {
+            Board hypotheticalBoard = this.board.clone();
+            int[] coord = ((List<Integer>) element.get("coord")).stream().mapToInt(i -> i + 1).toArray();
+            hypotheticalBoard.setPlayerAtCell(coord, player);
+            if (hypotheticalBoard.findThreeAcross().equals(player)) {
+                board.setPlayerAtCell(coord, player);
+                System.out.println("making move level \"medium\"");
+                return;
+            }
+        }
+
+        // check if opponent can win with one further move
+        for (Map<String, Object> element : openCells) {
+            Board hypotheticalBoard = this.board.clone();
+            int[] coord = ((List<Integer>) element.get("coord")).stream().mapToInt(i -> i + 1).toArray();
+            hypotheticalBoard.setPlayerAtCell(coord, opponent);
+            if (hypotheticalBoard.findThreeAcross().equals(opponent)) {
+                board.setPlayerAtCell(coord, player);
+                System.out.println("making move level \"medium\"");
+                return;
+            }
+        }
+
+        // make a random move
+        this.randomMove(player, this.board);
+        System.out.println("making move level \"medium\"");
     }
 
 }
