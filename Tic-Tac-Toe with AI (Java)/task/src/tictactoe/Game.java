@@ -1,9 +1,6 @@
 package tictactoe;
 
-import java.util.Scanner;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Game {
     private static final Scanner scanner = new Scanner(System.in);
@@ -27,7 +24,6 @@ public class Game {
 
         Player nextPlayer = Player.X;
 
-        // ideally, this would be named "GameState", but hyperskill doesn't want me to rename it
         BoardState currentState;
 
         // conduct game
@@ -45,12 +41,14 @@ public class Game {
                     case USER -> this.userTurn(Player.X);
                     case EASY -> this.easyTurn(Player.X);
                     case MEDIUM -> this.mediumTurn(Player.X);
+                    case HARD -> this.hardTurn(Player.X);
                 }
             } else {
                 switch (playerOType) {
                     case USER -> this.userTurn(Player.O);
                     case EASY -> this.easyTurn(Player.O);
                     case MEDIUM -> this.mediumTurn(Player.O);
+                    case HARD -> this.hardTurn(Player.O);
                 }
             }
 
@@ -163,6 +161,103 @@ public class Game {
         // make a random move
         this.randomMove(player, this.board);
         System.out.println("making move level \"medium\"");
+    }
+
+    private int minimax(Board board0, Player player) throws CloneNotSupportedException {
+
+        // check board state
+        BoardState currentState = board0.checkState();
+
+        // check if game finished + return appropriate score
+        if (!currentState.equals(BoardState.UNFINISHED)) {
+            if (currentState.equals(BoardState.DRAW)) {
+                return 0;
+            } else if (player.outputSymbol.equals(currentState.toString())) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
+
+        // get opponent
+        Player opponent;
+        if (player.equals(Player.X)) {
+            opponent = Player.O;
+        } else {
+            opponent = Player.X;
+        }
+
+        // get EMPTY cells
+        List<Map<String, Object>> openCells = new ArrayList<>();
+        for (Map<String, Object> element : board0.getCellProjection()) {
+            if (element.get("player").equals(Player.EMPTY)) {
+                openCells.add(element);
+            }
+        }
+
+        int score = -2;
+
+        // iterate through each EMPTY cell
+        for (Map<String, Object> element : openCells) {
+
+            // clone board
+            Board hypotheticalBoard = board0.clone();
+            int[] coord = ((List<Integer>) element.get("coord")).stream().mapToInt(i -> i + 1).toArray();
+
+            // mark cell as player
+            hypotheticalBoard.setPlayerAtCell(coord, player);
+
+            int hypotheticalScore = -minimax(hypotheticalBoard, opponent);
+
+            if (hypotheticalScore > score) {
+                score = hypotheticalScore;
+            }
+        }
+
+        return score;
+    }
+
+    public void hardTurn(Player player) throws CloneNotSupportedException {
+
+        // get opponent
+        Player opponent;
+        if (player.equals(Player.X)) {
+            opponent = Player.O;
+        } else {
+            opponent = Player.X;
+        }
+
+        // get EMPTY cells
+        List<Map<String, Object>> openCells = new ArrayList<>();
+        for (Map<String, Object> element : this.board.getCellProjection()) {
+            if (element.get("player").equals(Player.EMPTY)) {
+                openCells.add(element);
+            }
+        }
+
+        int score = -2;
+        int[] optimalCoord = new int[2];
+
+        // iterate through each EMPTY cell
+        for (Map<String, Object> element : openCells) {
+
+            // clone board
+            Board hypotheticalBoard = board.clone();
+            int[] coord = ((List<Integer>) element.get("coord")).stream().mapToInt(i -> i + 1).toArray();
+
+            // mark cell as player
+            hypotheticalBoard.setPlayerAtCell(coord, player);
+
+            int hypotheticalScore = -minimax(hypotheticalBoard, opponent);
+
+            if (hypotheticalScore > score) {
+                score = hypotheticalScore;
+                optimalCoord = coord;
+            }
+        }
+
+        this.board.setPlayerAtCell(optimalCoord, player);
+        System.out.println("making move level \"hard\"");
     }
 
 }
