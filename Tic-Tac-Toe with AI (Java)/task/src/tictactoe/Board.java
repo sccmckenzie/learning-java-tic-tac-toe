@@ -145,4 +145,25 @@ public class Board implements Cloneable {
             throw new RuntimeException(e);
         }
     }
+
+    public BoardState checkState() {
+        // check #1: three in row
+        switch (this.findThreeAcross()) {
+            case O:
+                return BoardState.O;
+            case X:
+                return BoardState.X;
+            default:
+                break;
+        }
+
+        // check #2: board full
+        int countX = this.countPlayer(Player.X);
+        int countO = this.countPlayer(Player.O);
+        if (countX + countO == 9) {
+            return BoardState.DRAW;
+        }
+
+        return BoardState.UNFINISHED;
+    }
 }

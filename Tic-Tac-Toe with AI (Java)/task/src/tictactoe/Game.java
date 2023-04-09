@@ -13,33 +13,9 @@ public class Game {
 
     private Board board;
 
-    // ideally, this would be named "GameState", but hyperskill doesn't want me to rename it
-    private BoardState boardState;
-
     public Game(PlayerType playerXType, PlayerType playerOType) {
         this.playerXType = playerXType;
         this.playerOType = playerOType;
-    }
-
-    public BoardState checkState() {
-        // check #1: three in row
-        switch (this.board.findThreeAcross()) {
-            case O:
-                return BoardState.O;
-            case X:
-                return BoardState.X;
-            default:
-                break;
-        }
-
-        // check #2: board full
-        int countX = this.board.countPlayer(Player.X);
-        int countO = this.board.countPlayer(Player.O);
-        if (countX + countO == 9) {
-            return BoardState.DRAW;
-        }
-
-        return BoardState.UNFINISHED;
     }
 
     public void execute() throws Exception {
@@ -51,12 +27,15 @@ public class Game {
 
         Player nextPlayer = Player.X;
 
+        // ideally, this would be named "GameState", but hyperskill doesn't want me to rename it
+        BoardState currentState;
+
         // conduct game
         game: for(int numMoves = 0; true; numMoves++) {
-            // check state, break game if conclusive
 
-            this.boardState = this.checkState();
-            if (!this.boardState.equals(BoardState.UNFINISHED)) {
+            // check state, break game if conclusive
+            currentState = this.board.checkState();
+            if (!currentState.equals(BoardState.UNFINISHED)) {
                 break game;
             }
 
@@ -86,7 +65,7 @@ public class Game {
             }
         }
 
-        System.out.println(this.boardState.getBoardStateMsg());
+        System.out.println(currentState.getBoardStateMsg());
 
     }
 
