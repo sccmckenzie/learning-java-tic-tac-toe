@@ -21,6 +21,27 @@ public class Game {
         this.playerOType = playerOType;
     }
 
+    public BoardState checkState() {
+        // check #1: three in row
+        switch (this.board.findThreeAcross()) {
+            case O:
+                return BoardState.O;
+            case X:
+                return BoardState.X;
+            default:
+                break;
+        }
+
+        // check #2: board full
+        int countX = this.board.countPlayer(Player.X);
+        int countO = this.board.countPlayer(Player.O);
+        if (countX + countO == 9) {
+            return BoardState.DRAW;
+        }
+
+        return BoardState.UNFINISHED;
+    }
+
     public void execute() throws Exception {
         // set board
         this.board = new Board("_________");
@@ -28,30 +49,15 @@ public class Game {
         // initial print
         this.board.print();
 
-        int countX = this.board.countPlayer(Player.X);
-        int countO = this.board.countPlayer(Player.O);
         Player nextPlayer = Player.X;
 
         // conduct game
         game: for(int numMoves = 0; true; numMoves++) {
             // check state, break game if conclusive
 
-            // check #1: three in row
-            switch (this.board.findThreeAcross()) {
-                case O:
-                    this.boardState = BoardState.O;
-                    break game;
-                case X:
-                    this.boardState = BoardState.X;
-                    break game;
-                default:
-                    break;
-            }
-
-            // check #2: board full
-            if (countX + countO == 9) {
-                this.boardState = BoardState.DRAW;
-                break;
+            this.boardState = this.checkState();
+            if (!this.boardState.equals(BoardState.UNFINISHED)) {
+                break game;
             }
 
             // conduct turn
@@ -68,8 +74,6 @@ public class Game {
                     case MEDIUM -> this.mediumTurn(Player.O);
                 }
             }
-            countX = board.countPlayer(Player.X);
-            countO = board.countPlayer(Player.O);
 
             // print board
             board.print();
@@ -83,7 +87,6 @@ public class Game {
         }
 
         System.out.println(this.boardState.getBoardStateMsg());
-
 
     }
 
