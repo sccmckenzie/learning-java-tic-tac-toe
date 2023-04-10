@@ -2,7 +2,7 @@ package tictactoe;
 
 import java.util.*;
 
-public class Game {
+public class Game extends Minimax {
     private static final Scanner scanner = new Scanner(System.in);
 
     private final PlayerType playerXType;
@@ -163,100 +163,8 @@ public class Game {
         System.out.println("making move level \"medium\"");
     }
 
-    private int minimax(Board board0, Player player) throws CloneNotSupportedException {
-
-        // check board state
-        BoardState currentState = board0.checkState();
-
-        // check if game finished + return appropriate score
-        if (!currentState.equals(BoardState.UNFINISHED)) {
-            if (currentState.equals(BoardState.DRAW)) {
-                return 0;
-            } else if (player.outputSymbol.equals(currentState.toString())) {
-                return 1;
-            } else {
-                return -1;
-            }
-        }
-
-        // get opponent
-        Player opponent;
-        if (player.equals(Player.X)) {
-            opponent = Player.O;
-        } else {
-            opponent = Player.X;
-        }
-
-        // get EMPTY cells
-        List<Map<String, Object>> openCells = new ArrayList<>();
-        for (Map<String, Object> element : board0.getCellProjection()) {
-            if (element.get("player").equals(Player.EMPTY)) {
-                openCells.add(element);
-            }
-        }
-
-        int score = -2;
-
-        // iterate through each EMPTY cell
-        for (Map<String, Object> element : openCells) {
-
-            // clone board
-            Board hypotheticalBoard = board0.clone();
-            int[] coord = ((List<Integer>) element.get("coord")).stream().mapToInt(i -> i + 1).toArray();
-
-            // mark cell as player
-            hypotheticalBoard.setPlayerAtCell(coord, player);
-
-            int hypotheticalScore = -minimax(hypotheticalBoard, opponent);
-
-            if (hypotheticalScore > score) {
-                score = hypotheticalScore;
-            }
-        }
-
-        return score;
-    }
-
     public void hardTurn(Player player) throws CloneNotSupportedException {
-
-        // get opponent
-        Player opponent;
-        if (player.equals(Player.X)) {
-            opponent = Player.O;
-        } else {
-            opponent = Player.X;
-        }
-
-        // get EMPTY cells
-        List<Map<String, Object>> openCells = new ArrayList<>();
-        for (Map<String, Object> element : this.board.getCellProjection()) {
-            if (element.get("player").equals(Player.EMPTY)) {
-                openCells.add(element);
-            }
-        }
-
-        int score = -2;
-        int[] optimalCoord = new int[2];
-
-        // iterate through each EMPTY cell
-        for (Map<String, Object> element : openCells) {
-
-            // clone board
-            Board hypotheticalBoard = board.clone();
-            int[] coord = ((List<Integer>) element.get("coord")).stream().mapToInt(i -> i + 1).toArray();
-
-            // mark cell as player
-            hypotheticalBoard.setPlayerAtCell(coord, player);
-
-            int hypotheticalScore = -minimax(hypotheticalBoard, opponent);
-
-            if (hypotheticalScore > score) {
-                score = hypotheticalScore;
-                optimalCoord = coord;
-            }
-        }
-
-        this.board.setPlayerAtCell(optimalCoord, player);
+        this.board.setPlayerAtCell(Minimax.minimax(this.board, player).getCoord(), player);
         System.out.println("making move level \"hard\"");
     }
 
